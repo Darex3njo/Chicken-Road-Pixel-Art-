@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Skin } from '../types';
+import { Skin, PowerUpType } from '../types';
 
 // --- Pixel Art Engine ---
 interface PixelGraphicProps {
@@ -301,9 +301,9 @@ export const SplatAsset = () => {
 }
 
 // --- Car Asset ---
-export const CarAsset = ({ type, direction }: { type: number, direction: number }) => {
+export const CarAsset = ({ type, direction, subtype }: { type: number, direction: number, subtype?: string }) => {
   // High-res map (22px wide) to match "2-block" width density
-  const map = [
+  let map = [
     "....xxxxxxxxxxxxxx....",
     "..xxssssssssssssssxx..",
     ".xsssswwwwwwwwwwssssx.",
@@ -314,10 +314,30 @@ export const CarAsset = ({ type, direction }: { type: number, direction: number 
     ".xox..xox....xox..xox.", // Wheels
     ".xxx..xxx....xxx..xxx."
   ];
-
-  const palette: any = { '.': 'none', 'x': '#0f172a', 'w': '#bfdbfe', 'o': '#334155' };
+  
+  const palette: any = { '.': 'none', 'x': '#0f172a', 'w': '#bfdbfe', 'o': '#334155', 'b': '#3b82f6', 'r': '#ef4444' };
   const colors = ['#ef4444', '#3b82f6', '#eab308', '#a855f7'];
-  palette.s = colors[type % colors.length];
+  
+  if (subtype === 'POLICE') {
+      map = [
+        ".........brbr.........",
+        "....xxxxxxxxxxxxxx....",
+        "..xxssssssssssssssxx..",
+        ".xsssswwwwwwwwwwssssx.",
+        ".xssswwwwwwwwwwwwsssx.",
+        "xsssswwwwwwwwwwwwssssx",
+        "xssssssssssssssssssssx",
+        "xxxxxxxxxxxxxxxxxxxxxx",
+        ".xox..xox....xox..xox.", 
+        ".xxx..xxx....xxx..xxx."
+      ];
+      palette.s = '#1e293b';
+      palette.w = '#e2e8f0';
+  } else if (subtype === 'TRUCK') {
+      palette.s = '#475569'; 
+  } else {
+      palette.s = colors[type % colors.length];
+  }
 
   return (
     <div className="w-full h-full p-1" style={{ transform: direction === -1 ? 'scaleX(-1)' : 'none' }}>
@@ -325,6 +345,25 @@ export const CarAsset = ({ type, direction }: { type: number, direction: number 
     </div>
   );
 };
+
+// --- Train Asset ---
+export const TrainAsset = ({ direction }: { direction: number }) => {
+    // Long train segment
+    const map = [
+        "xxxxxxxxxxxxxxxxxxxxxxxx",
+        "xssssssssssssssssssssssx",
+        "xswwswwswwswwswwswwswwsx",
+        "xssssssssssssssssssssssx",
+        "xxxxxxxxxxxxxxxxxxxxxxxx",
+        ".oo..oo..oo..oo..oo..oo.",
+        ".oo..oo..oo..oo..oo..oo."
+    ];
+    return (
+        <div className="w-full h-full flex items-center" style={{ transform: direction === -1 ? 'scaleX(-1)' : 'none' }}>
+             <PixelGraphic map={map} palette={{'.': 'none', 'x': '#171717', 's': '#dc2626', 'w': '#bfdbfe', 'o': '#000'}} />
+        </div>
+    )
+}
 
 // --- Tree Asset ---
 export const TreeAsset = ({ variant = 1 }: { variant?: number }) => {
@@ -455,6 +494,45 @@ export const LilypadAsset = () => {
     );
 }
 
+export const WarningLightAsset = ({ active }: { active: boolean }) => {
+    const map = [
+        "..xxx..",
+        ".xrrrx.",
+        "xrrrrrx",
+        "xrrrrrx",
+        "xrrrrrx",
+        ".xrrrx.",
+        "..xxx..",
+        "...s...",
+        "...s...",
+        "...s..."
+    ];
+    return (
+        <div className={`w-full h-full flex items-end justify-center pb-1 ${active ? 'animate-pulse' : ''}`}>
+            <div className="w-4 h-8">
+                <PixelGraphic map={map} palette={{'.':'none', 'x': '#7f1d1d', 'r': active ? '#ef4444' : '#450a0a', 's': '#444'}} />
+            </div>
+        </div>
+    )
+}
+
+export const HazardWarningAsset = () => {
+    const map = [
+        ".........",
+        "....x....",
+        "...xyx...",
+        "..xyyyx..",
+        ".xyyxyyx.",
+        "xyyyyyyyx",
+        "xxxxxxxxx"
+    ];
+    return (
+        <div className="w-full h-full animate-ping">
+             <PixelGraphic map={map} palette={{'.': 'none', 'x': '#dc2626', 'y': '#facc15'}} />
+        </div>
+    )
+}
+
 export const SplashAsset = () => {
     const map = [
         "..........",
@@ -481,3 +559,69 @@ export const CoinCollectEffect = () => {
         </div>
     )
 }
+
+export const PowerUpAsset = ({ type }: { type: string }) => {
+    let map: string[] = [];
+    let palette: any = { '.': 'none' };
+
+    if (type === 'SHIELD') {
+        map = [
+            "..xxxx..",
+            ".xwwwwx.",
+            "xwbbbbbx",
+            "xbbbbbbx",
+            "xbbbbbbx",
+            ".xbbbbx.",
+            "..xxxx.."
+        ];
+        palette = { ...palette, x: '#1e3a8a', w: '#60a5fa', b: '#2563eb' }; 
+    } else if (type === 'TIME_SLOW') {
+        map = [
+            "xxxxxx",
+            "xggggx",
+            ".xxxx.",
+            "..xx..",
+            ".xxxx.",
+            "xggggx",
+            "xxxxxx"
+        ];
+        palette = { ...palette, x: '#854d0e', g: '#fef08a' };
+    } else if (type === 'MAGNET') {
+        map = [
+            "s....s",
+            "s....s",
+            "r....r",
+            "r....r",
+            "rrrrrr",
+            ".rrrr."
+        ];
+        palette = { ...palette, s: '#94a3b8', r: '#ef4444' }; // Silver tips, red body
+    } else if (type === 'WATER_WALK') {
+        map = [
+            "....xx..",
+            "...xxxx.",
+            "..xxxxxx",
+            ".xxxxxxx",
+            "xxxxxxxx",
+            "xxxxxxxx"
+        ];
+        palette = { ...palette, x: '#06b6d4' }; // Cyan boot
+    } else if (type === 'DOUBLE_COINS') {
+        map = [
+            "..xxxx",
+            ".xyyyx",
+            "xyyyx.",
+            "xxxx..",
+            ".xyyyx",
+            ".xyyyx",
+            "..xxxx"
+        ];
+        palette = { ...palette, x: '#b45309', y: '#facc15' };
+    }
+
+    return (
+        <div className="w-full h-full p-1 flex items-center justify-center">
+             <PixelGraphic map={map} palette={palette} />
+        </div>
+    );
+};

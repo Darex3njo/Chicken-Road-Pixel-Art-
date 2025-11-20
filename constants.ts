@@ -1,5 +1,5 @@
 
-import { Skin } from './types';
+import { Skin, Challenge } from './types';
 
 export const GAME_CONFIG = {
   GRID_SIZE: 48, // Scaled for pixel art (16x3)
@@ -7,6 +7,49 @@ export const GAME_CONFIG = {
   INITIAL_ROWS: 20,
   GAME_SPEED: 10,
 };
+
+export const CHALLENGES: Challenge[] = [
+  {
+    id: 1,
+    title: 'SPRINT TRAINING',
+    description: 'Reach 50 Steps in 45 Seconds',
+    type: 'SCORE',
+    target: 50,
+    timeLimit: 45,
+    reward: 50,
+    difficulty: 'EASY'
+  },
+  {
+    id: 2,
+    title: 'COIN RUSH',
+    description: 'Collect 10 Coins in 60 Seconds',
+    type: 'COINS',
+    target: 10,
+    timeLimit: 60,
+    reward: 100,
+    difficulty: 'EASY'
+  },
+  {
+    id: 3,
+    title: 'SPEED DEMON',
+    description: 'Reach 100 Steps in 60 Seconds',
+    type: 'SCORE',
+    target: 100,
+    timeLimit: 60,
+    reward: 200,
+    difficulty: 'MEDIUM'
+  },
+  {
+    id: 4,
+    title: 'TREASURE HUNT',
+    description: 'Collect 25 Coins without dying',
+    type: 'COINS',
+    target: 25,
+    timeLimit: 120,
+    reward: 500,
+    difficulty: 'HARD'
+  }
+];
 
 export const INITIAL_SKINS: Skin[] = [
   // COMMON
