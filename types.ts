@@ -45,7 +45,6 @@ export interface Obstacle {
   width: number;
   direction: 1 | -1;
   skin?: string; // Specific visual variant
-  subtype?: 'SEDAN' | 'POLICE' | 'TRUCK' | 'SPORT';
 }
 
 export interface RowData {
@@ -57,8 +56,8 @@ export interface RowData {
   laneSpeed?: number; // For roads/water
   direction?: 1 | -1;
   trainState?: {
-      state: 'IDLE' | 'WARNING' | 'PASSING';
-      timer: number;
+    state: 'IDLE' | 'WARNING' | 'PASSING';
+    timer: number;
   };
 }
 

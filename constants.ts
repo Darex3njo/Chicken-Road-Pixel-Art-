@@ -1,5 +1,5 @@
 
-import { Skin, Challenge } from './types';
+import { Skin, Challenge, PowerUpType } from './types';
 
 export const GAME_CONFIG = {
   GRID_SIZE: 48, // Scaled for pixel art (16x3)
@@ -7,6 +7,14 @@ export const GAME_CONFIG = {
   INITIAL_ROWS: 20,
   GAME_SPEED: 10,
 };
+
+export const SHOP_POWERUPS: { type: PowerUpType; name: string; price: number; description: string }[] = [
+  { type: 'SHIELD', name: 'Shield', price: 1000, description: 'One-hit protection' },
+  { type: 'MAGNET', name: 'Magnet', price: 1500, description: 'Attracts coins' },
+  { type: 'DOUBLE_COINS', name: '2x Coins', price: 2000, description: 'Doubles coin value' },
+  { type: 'TIME_SLOW', name: 'Time Warp', price: 2500, description: 'Slows everything' },
+  { type: 'WATER_WALK', name: 'Jesus Boots', price: 3000, description: 'Walk on water' },
+];
 
 export const CHALLENGES: Challenge[] = [
   {

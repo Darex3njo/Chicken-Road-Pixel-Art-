@@ -197,37 +197,29 @@ export const playClick = () => {
 export const playTrainWarning = () => {
     if (muted) return;
     const context = getCtx();
-    const osc1 = context.createOscillator();
-    const osc2 = context.createOscillator();
-    const gain = context.createGain();
+    const now = context.currentTime;
     
-    // Bell sound
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(600, context.currentTime);
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(800, context.currentTime);
-    
-    gain.gain.setValueAtTime(0.1, context.currentTime);
-    
-    // Ding-ding-ding
-    [0, 0.2, 0.4, 0.6].forEach(t => {
-        gain.gain.setValueAtTime(0.1, context.currentTime + t);
-        gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + t + 0.15);
-    });
-    
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(context.destination);
-    
-    osc1.start();
-    osc1.stop(context.currentTime + 0.8);
-    osc2.start();
-    osc2.stop(context.currentTime + 0.8);
+    // Ding Ding Ding
+    for(let i=0; i<3; i++) {
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = 'square'; // Bell-ish
+        osc.frequency.setValueAtTime(800, now + (i * 0.25));
+        
+        gain.gain.setValueAtTime(0.05, now + (i * 0.25));
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.25) + 0.2);
+        
+        osc.connect(gain);
+        gain.connect(context.destination);
+        osc.start(now + (i * 0.25));
+        osc.stop(now + (i * 0.25) + 0.25);
+    }
 };
 
 export const playTrainPass = () => {
     if (muted) return;
     const context = getCtx();
+    const now = context.currentTime;
     
     // Rumble
     const bufferSize = context.sampleRate * 1.5;
@@ -242,33 +234,17 @@ export const playTrainPass = () => {
 
     const filter = context.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(100, context.currentTime);
-    filter.frequency.linearRampToValueAtTime(50, context.currentTime + 1.5);
+    filter.frequency.setValueAtTime(100, now);
+    filter.frequency.linearRampToValueAtTime(600, now + 0.5);
+    filter.frequency.linearRampToValueAtTime(100, now + 1.5);
 
     const gain = context.createGain();
-    gain.gain.setValueAtTime(0.0, context.currentTime);
-    gain.gain.linearRampToValueAtTime(0.3, context.currentTime + 0.2);
-    gain.gain.linearRampToValueAtTime(0.3, context.currentTime + 1.0);
-    gain.gain.linearRampToValueAtTime(0.0, context.currentTime + 1.5);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.2, now + 0.5);
+    gain.gain.linearRampToValueAtTime(0, now + 1.5);
 
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(context.destination);
     noise.start();
-    
-    // Horn
-    const osc = context.createOscillator();
-    const hornGain = context.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(200, context.currentTime);
-    osc.frequency.linearRampToValueAtTime(180, context.currentTime + 0.5);
-    
-    hornGain.gain.setValueAtTime(0, context.currentTime);
-    hornGain.gain.linearRampToValueAtTime(0.1, context.currentTime + 0.1);
-    hornGain.gain.linearRampToValueAtTime(0, context.currentTime + 0.6);
-    
-    osc.connect(hornGain);
-    hornGain.connect(context.destination);
-    osc.start(context.currentTime + 0.2);
-    osc.stop(context.currentTime + 0.8);
 };

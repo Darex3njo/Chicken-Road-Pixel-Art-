@@ -10,6 +10,9 @@ interface PixelGraphicProps {
 }
 
 const PixelGraphic: React.FC<PixelGraphicProps> = ({ map, palette, scale = 1 }) => {
+  // Safety check to prevent crashes if map is invalid
+  if (!map || map.length === 0 || !map[0]) return null;
+
   const pixelSize = 4; // Base pixel size
   const width = map[0].length * pixelSize;
   const height = map.length * pixelSize;
@@ -301,9 +304,9 @@ export const SplatAsset = () => {
 }
 
 // --- Car Asset ---
-export const CarAsset = ({ type, direction, subtype }: { type: number, direction: number, subtype?: string }) => {
+export const CarAsset = ({ type, direction }: { type: number, direction: number }) => {
   // High-res map (22px wide) to match "2-block" width density
-  let map = [
+  const map = [
     "....xxxxxxxxxxxxxx....",
     "..xxssssssssssssssxx..",
     ".xsssswwwwwwwwwwssssx.",
@@ -314,30 +317,10 @@ export const CarAsset = ({ type, direction, subtype }: { type: number, direction
     ".xox..xox....xox..xox.", // Wheels
     ".xxx..xxx....xxx..xxx."
   ];
-  
-  const palette: any = { '.': 'none', 'x': '#0f172a', 'w': '#bfdbfe', 'o': '#334155', 'b': '#3b82f6', 'r': '#ef4444' };
+
+  const palette: any = { '.': 'none', 'x': '#0f172a', 'w': '#bfdbfe', 'o': '#334155' };
   const colors = ['#ef4444', '#3b82f6', '#eab308', '#a855f7'];
-  
-  if (subtype === 'POLICE') {
-      map = [
-        ".........brbr.........",
-        "....xxxxxxxxxxxxxx....",
-        "..xxssssssssssssssxx..",
-        ".xsssswwwwwwwwwwssssx.",
-        ".xssswwwwwwwwwwwwsssx.",
-        "xsssswwwwwwwwwwwwssssx",
-        "xssssssssssssssssssssx",
-        "xxxxxxxxxxxxxxxxxxxxxx",
-        ".xox..xox....xox..xox.", 
-        ".xxx..xxx....xxx..xxx."
-      ];
-      palette.s = '#1e293b';
-      palette.w = '#e2e8f0';
-  } else if (subtype === 'TRUCK') {
-      palette.s = '#475569'; 
-  } else {
-      palette.s = colors[type % colors.length];
-  }
+  palette.s = colors[type % colors.length];
 
   return (
     <div className="w-full h-full p-1" style={{ transform: direction === -1 ? 'scaleX(-1)' : 'none' }}>
@@ -348,19 +331,36 @@ export const CarAsset = ({ type, direction, subtype }: { type: number, direction
 
 // --- Train Asset ---
 export const TrainAsset = ({ direction }: { direction: number }) => {
-    // Long train segment
+  // Very long asset (visually)
+  const map = [
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "xrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrx",
+      "xrrrrwwwwwwwwrrrrwwwwwwwwrrrrwwwwrrrrx",
+      "xrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrx",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "xoxxoxxoxxoxxoxxoxxoxxoxxoxxoxxoxxoxxo",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  ];
+  
+  return (
+     <div className="h-full" style={{ width: '200%', transform: direction === -1 ? 'scaleX(-1)' : 'none' }}>
+         <PixelGraphic map={map} palette={{ '.': 'none', 'x': '#171717', 'r': '#dc2626', 'w': '#fca5a5', 'o': '#525252' }} />
+     </div>
+  );
+}
+
+export const WarningLightAsset = ({ active }: { active: boolean }) => {
     const map = [
-        "xxxxxxxxxxxxxxxxxxxxxxxx",
-        "xssssssssssssssssssssssx",
-        "xswwswwswwswwswwswwswwsx",
-        "xssssssssssssssssssssssx",
-        "xxxxxxxxxxxxxxxxxxxxxxxx",
-        ".oo..oo..oo..oo..oo..oo.",
-        ".oo..oo..oo..oo..oo..oo."
+        "..x..",
+        ".xrx.",
+        ".xrx.",
+        "..x..",
+        "..s.."
     ];
+    const color = active ? '#ef4444' : '#450a0a';
     return (
-        <div className="w-full h-full flex items-center" style={{ transform: direction === -1 ? 'scaleX(-1)' : 'none' }}>
-             <PixelGraphic map={map} palette={{'.': 'none', 'x': '#171717', 's': '#dc2626', 'w': '#bfdbfe', 'o': '#000'}} />
+        <div className="w-full h-full flex items-center justify-center">
+             <PixelGraphic map={map} palette={{ '.': 'none', 'x': '#000', 'r': color, 's': '#78716c' }} />
         </div>
     )
 }
@@ -494,45 +494,6 @@ export const LilypadAsset = () => {
     );
 }
 
-export const WarningLightAsset = ({ active }: { active: boolean }) => {
-    const map = [
-        "..xxx..",
-        ".xrrrx.",
-        "xrrrrrx",
-        "xrrrrrx",
-        "xrrrrrx",
-        ".xrrrx.",
-        "..xxx..",
-        "...s...",
-        "...s...",
-        "...s..."
-    ];
-    return (
-        <div className={`w-full h-full flex items-end justify-center pb-1 ${active ? 'animate-pulse' : ''}`}>
-            <div className="w-4 h-8">
-                <PixelGraphic map={map} palette={{'.':'none', 'x': '#7f1d1d', 'r': active ? '#ef4444' : '#450a0a', 's': '#444'}} />
-            </div>
-        </div>
-    )
-}
-
-export const HazardWarningAsset = () => {
-    const map = [
-        ".........",
-        "....x....",
-        "...xyx...",
-        "..xyyyx..",
-        ".xyyxyyx.",
-        "xyyyyyyyx",
-        "xxxxxxxxx"
-    ];
-    return (
-        <div className="w-full h-full animate-ping">
-             <PixelGraphic map={map} palette={{'.': 'none', 'x': '#dc2626', 'y': '#facc15'}} />
-        </div>
-    )
-}
-
 export const SplashAsset = () => {
     const map = [
         "..........",
@@ -560,63 +521,81 @@ export const CoinCollectEffect = () => {
     )
 }
 
+// --- 8x8 Enhanced PowerUp Assets ---
 export const PowerUpAsset = ({ type }: { type: string }) => {
     let map: string[] = [];
     let palette: any = { '.': 'none' };
 
     if (type === 'SHIELD') {
+        // Blue Heater Shield with metal sheen
         map = [
             "..xxxx..",
-            ".xwwwwx.",
-            "xwbbbbbx",
-            "xbbbbbbx",
-            "xbbbbbbx",
+            ".xbbbbx.",
+            "xbbwwbbx",
+            "xbwwwwbx",
+            "xbbwwbbx",
             ".xbbbbx.",
             "..xxxx.."
         ];
-        palette = { ...palette, x: '#1e3a8a', w: '#60a5fa', b: '#2563eb' }; 
+        palette = { ...palette, x: '#1e3a8a', w: '#93c5fd', b: '#2563eb' }; 
     } else if (type === 'TIME_SLOW') {
+        // Hourglass with sand
+        map = [
+            ".xxxxxx.",
+            ".xoooox.",
+            "..xoox..",
+            "...xx...",
+            "..xoox..",
+            ".xoooox.",
+            ".xxxxxx."
+        ];
+        palette = { ...palette, x: '#854d0e', o: '#fef08a' };
+    } else if (type === 'MAGNET') {
+        // Red horseshoe magnet with silver tips
+        map = [
+            "s.s..s.s",
+            "s.s..s.s",
+            "r.r..r.r",
+            "r.r..r.r",
+            "r.rrrr.r",
+            ".r....r.",
+            "..rrrr.."
+        ];
+        palette = { ...palette, s: '#e2e8f0', r: '#ef4444' }; 
+    } else if (type === 'WATER_WALK') {
+        // Winged Boot
+        map = [
+            "...w....",
+            "..wcc...",
+            ".wcc....",
+            "ccccc...",
+            "ccccccc.",
+            "ccccccc."
+        ];
+        palette = { ...palette, w: '#ffffff', c: '#06b6d4' }; 
+    } else if (type === 'DOUBLE_COINS') {
+        // Stacked Gold Coins
+        map = [
+            "..yyy...",
+            ".yoyy...",
+            ".yyy....",
+            "..y..yyy",
+            "..y.yoyy",
+            ".....yyy"
+        ];
+        palette = { ...palette, o: '#fefce8', y: '#fbbf24' }; 
+    } else {
+        // DEFAULT FALLBACK
         map = [
             "xxxxxx",
-            "xggggx",
-            ".xxxx.",
-            "..xx..",
-            ".xxxx.",
-            "xggggx",
+            "x....x",
+            "x.xx.x",
+            "x....x",
+            "x.xx.x",
+            "x....x",
             "xxxxxx"
         ];
-        palette = { ...palette, x: '#854d0e', g: '#fef08a' };
-    } else if (type === 'MAGNET') {
-        map = [
-            "s....s",
-            "s....s",
-            "r....r",
-            "r....r",
-            "rrrrrr",
-            ".rrrr."
-        ];
-        palette = { ...palette, s: '#94a3b8', r: '#ef4444' }; // Silver tips, red body
-    } else if (type === 'WATER_WALK') {
-        map = [
-            "....xx..",
-            "...xxxx.",
-            "..xxxxxx",
-            ".xxxxxxx",
-            "xxxxxxxx",
-            "xxxxxxxx"
-        ];
-        palette = { ...palette, x: '#06b6d4' }; // Cyan boot
-    } else if (type === 'DOUBLE_COINS') {
-        map = [
-            "..xxxx",
-            ".xyyyx",
-            "xyyyx.",
-            "xxxx..",
-            ".xyyyx",
-            ".xyyyx",
-            "..xxxx"
-        ];
-        palette = { ...palette, x: '#b45309', y: '#facc15' };
+        palette = { ...palette, x: '#9ca3af' };
     }
 
     return (
